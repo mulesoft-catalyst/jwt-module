@@ -1,6 +1,5 @@
 package uk.org.mule.jwt.internal;
 
-
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.InvalidKeyException;
@@ -17,7 +16,6 @@ import org.bouncycastle.openssl.jcajce.JceOpenSSLPKCS8DecryptorProviderBuilder;
 import org.bouncycastle.operator.InputDecryptorProvider;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.pkcs.PKCS8EncryptedPrivateKeyInfo;
-
 import org.bouncycastle.pkcs.PKCSException;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.param.Config;
@@ -53,6 +51,7 @@ public class JwtOperations {
                        @Config JwtConfiguration config) {
         String jws;
         PEMParser parser = null;
+        Security.addProvider(new BouncyCastleProvider());
         try {
             parser = new PEMParser(
                          new InputStreamReader(new FileInputStream(config.getKeyPath()), StandardCharsets.UTF_8));
@@ -68,13 +67,18 @@ public class JwtOperations {
             else if (object instanceof PEMEncryptedKeyPair) {
                 PEMEncryptedKeyPair encryptedKeyPair = ((PEMEncryptedKeyPair)object);
                 PEMDecryptorProvider provider =
-                        new JcePEMDecryptorProviderBuilder().build(config.getPassphrase().toCharArray());
+                        new JcePEMDecryptorProviderBuilder().
+                                setProvider(BouncyCastleProvider.PROVIDER_NAME).
+                                build(config.getPassphrase().toCharArray());
                 PEMKeyPair keyPair = encryptedKeyPair.decryptKeyPair(provider);
                 keyInfo = keyPair.getPrivateKeyInfo();
             } else if (object instanceof PKCS8EncryptedPrivateKeyInfo) {
-                Security.addProvider(new BouncyCastleProvider());
-                InputDecryptorProvider decryptorProvider = new JceOpenSSLPKCS8DecryptorProviderBuilder().setProvider("BC").build(config.getPassphrase().toCharArray());
-                keyInfo = ((PKCS8EncryptedPrivateKeyInfo) object).decryptPrivateKeyInfo(decryptorProvider);
+                PKCS8EncryptedPrivateKeyInfo encryptedPrivateKeyInfo = ((PKCS8EncryptedPrivateKeyInfo)object);
+                InputDecryptorProvider decryptorProvider =
+                        new JceOpenSSLPKCS8DecryptorProviderBuilder().
+                                setProvider(BouncyCastleProvider.PROVIDER_NAME).
+                                build(config.getPassphrase().toCharArray());
+                keyInfo = encryptedPrivateKeyInfo.decryptPrivateKeyInfo(decryptorProvider);
             }
             else {
                 throw new InvalidKeyException(config.getKeyPath() + " is not a PrivateKey, but " + object.getClass());
@@ -109,7 +113,7 @@ public class JwtOperations {
                           PrivateKeyInfo privateKeyInfo) throws PEMException {
         String jws = null;
         if (privateKeyInfo != null) {
-            JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
+            JcaPEMKeyConverter converter = new JcaPEMKeyConverter().setProvider(BouncyCastleProvider.PROVIDER_NAME);
             PrivateKey privateKey = converter.getPrivateKey(privateKeyInfo);
             JwtBuilder builder = Jwts.builder().setClaims(Jwts.claims(payload));
             if (header != null) {

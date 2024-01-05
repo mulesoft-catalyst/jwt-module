@@ -1,17 +1,18 @@
 package uk.org.mule.jwt.internal;
 
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.SignatureAlgorithm;
 
 enum JwtAlgorithm {
-    ES256(SignatureAlgorithm.ES256),
-    ES384(SignatureAlgorithm.ES384),
-    ES512(SignatureAlgorithm.ES512),
-    PS256(SignatureAlgorithm.PS256),
-    PS384(SignatureAlgorithm.PS384),
-    PS512(SignatureAlgorithm.PS512),
-    RS256(SignatureAlgorithm.RS256),
-    RS384(SignatureAlgorithm.RS384),
-    RS512(SignatureAlgorithm.RS512);
+    ES256(Jwts.SIG.ES256),
+    ES384(Jwts.SIG.ES384),
+    ES512(Jwts.SIG.ES512),
+    PS256(Jwts.SIG.PS256),
+    PS384(Jwts.SIG.PS384),
+    PS512(Jwts.SIG.PS512),
+    RS256(Jwts.SIG.RS256),
+    RS384(Jwts.SIG.RS384),
+    RS512(Jwts.SIG.RS512);
 
     private final SignatureAlgorithm algorithm;
 

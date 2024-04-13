@@ -44,7 +44,7 @@ For deployment to the EU Control Plane, please update the `<distributionManageme
 
 ## Usage
 
-Once the module has been deployed to Exchange, you can add it to your project by following the steps outlined at [https://docs.mulesoft.com/studio/7.12/add-modules-in-studio-to](https://docs.mulesoft.com/studio/7.12/add-modules-in-studio-to) to make it available in your Mule Palette.
+Once the module has been deployed to Exchange, you can add it to your project by following the steps outlined at [https://docs.mulesoft.com/studio/latest/add-modules-in-studio-to](https://docs.mulesoft.com/studio/latest/add-modules-in-studio-to) to make it available in your Mule Palette.
 
 ![Mule Palette](/images/mule-palette.png)
 
